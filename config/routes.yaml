@@ -1,5 +1,17 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+#controllers:
+#    resource:
+#        path: ../src/Controller/
+#        namespace: App\Controller
+#    type: attribute
+index:
+    path: /
+    controller: App\Controller\FrontendController::index
+list:
+    path: /list
+    controller: App\Controller\ApiController::list
+
+details:
+    path: /details/{id}
+    controller: App\Controller\ApiController::details
+    defaults:
+        id: null

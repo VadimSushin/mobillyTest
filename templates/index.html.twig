@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <h4>Create web service with REST API which provide info about wether stations in Latvia.</h4>
+
+    Requirements:
+    <ol>
+        <li>
+            API should expose two endpoints:
+            <ul>
+                <li>
+                    List of all stations with two properties: Station_id and Name,
+                </li>
+                <li>
+                    Station details by Station_id with all data fields found in data source;
+                </li>
+            </ul>
+        </li>
+        <li>
+            In order to limit access to API implement simple HTTP bearer preshared key authentication;
+        </li>
+        <li>
+            Write Unittests if neecessary;
+        </li>
+        <li>
+            Write OpenAPI specification for service;
+        </li>
+        <li>
+            Create Dockerfile so webservice can be used by runing docker run;
+        </li>
+        <li>
+            Assume data in data source is subject of change;
+        </li>
+        <li>
+            Use data from open data source: <a href="https://data.gov.lv/dati/lv/dataset/hidrometeorologiskie-noverojumi/resource/c32c7afd-0d05-44fd-8b24-1de85b4bf11d">https://data.gov.lv/dati/lv/dataset/hidrometeorologiskie-noverojumi/resource/c32c7afd-0d05-44fd-8b24-1de85b4bf11d</a>;
+        </li>
+        <li>
+            Commit each step;
+        </li>
+        <li>
+            Provide result as GitHub repository.
+        </li>
+    </ol>
+
+{% endblock %}
