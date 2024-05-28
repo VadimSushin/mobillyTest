@@ -50,19 +50,46 @@ class ApiController extends AbstractController
         }
         if (is_null($id)) {
             // No station ID provided
-            return new JsonResponse(['success' => false, 'Error' => ['message' => 'No station Id in request', '__type' => 'Wrong request']], 404);
+            return new JsonResponse(
+                [
+                    'success' => false,
+                    'Error' => [
+                        'message' => 'No station Id in request',
+                        '__type' => 'Wrong request'
+                    ]
+                ],
+                404
+            );
         }
         $details = $this->sourceApi->getDetails($id);
 
         if (!$details['success']) {
-            //datasource error
+            //data source error
             return new JsonResponse(['success' => false, 'Error' => $details['error']], 200);
         } elseif ($details['result']['total'] > 1) {
             //multiple results received
-            return new JsonResponse(['success' => false, 'Error' => ['message' => 'More than one station found', '__type' => 'Wrong request']], 200);
+            return new JsonResponse(
+                [
+                    'success' => false,
+                    'Error' => [
+                        'message' => 'More than one station found',
+                        '__type' => 'Wrong request'
+                    ]
+                ],
+                200
+            );
         } elseif ($details['result']['total'] === 0) {
             //nothing found
-            return new JsonResponse(['success' => false, 'Error' => ['message' => 'Nothing found', '__type' => 'Not Found Error']], 404);
+            return new JsonResponse(
+                [
+                    'success' => false,
+                    'Error' => [
+                        'message' => 'Nothing found',
+                        '__type' => 'Not Found Error'
+                    ]
+                ],
+                404
+            );
         }
         return new JsonResponse(['success' => true, 'result' => $details['result']['records'][0]]);
     }

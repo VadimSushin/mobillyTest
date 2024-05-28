@@ -25,8 +25,19 @@ class DatasourceTest extends KernelTestCase
         $this->assertEquals($detailsResponse['result']['total'], 0,'details not found wrong_id');
 
         $detailsResponse = $datasourceConnectorService->getDetails($listResponse['result']['records'][0]['STATION_ID']);
-        $this->assertArrayHasKey('success', $detailsResponse, 'details retrieve '.$listResponse['result']['records'][0]['STATION_ID']);
-        $this->assertTrue($detailsResponse['success'], 'details success '.$listResponse['result']['records'][0]['STATION_ID']);
-        $this->assertEquals($detailsResponse['result']['total'], 1,'details found '.$listResponse['result']['records'][0]['STATION_ID']);
+        $this->assertArrayHasKey(
+            'success',
+            $detailsResponse,
+            'details retrieve '.$listResponse['result']['records'][0]['STATION_ID']
+        );
+        $this->assertTrue(
+            $detailsResponse['success'],
+            'details success '.$listResponse['result']['records'][0]['STATION_ID']
+        );
+        $this->assertEquals(
+            $detailsResponse['result']['total'],
+            1,
+            'details found '.$listResponse['result']['records'][0]['STATION_ID']
+        );
     }
 }

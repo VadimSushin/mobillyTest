@@ -10,11 +10,14 @@ class ApiTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $crawler = $client->request('GET', '/');
+        $client->request('GET', '/');
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h4', 'Create web service with REST API which provide info about wether stations in Latvia.');
+        $this->assertSelectorTextContains(
+            'h4',
+            'Create web service with REST API which provide info about wether stations in Latvia.'
+        );
 
-        $crawler = $client->request('GET', '/list');
+        $client->request('GET', '/list');
         $response = $client->getResponse();
         $this->assertResponseIsSuccessful();
         $this->assertSame(200, $response->getStatusCode());
@@ -22,10 +25,10 @@ class ApiTest extends WebTestCase
         $responseArray = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('success', $responseArray);
         $this->assertTrue($responseArray['success']);
+
         $validId = $responseArray['result'][0]['station_id'];
 
-
-        $crawler = $client->request('GET', '/details');
+        $client->request('GET', '/details');
         $response = $client->getResponse();
         $this->assertSame(404, $response->getStatusCode());
         $this->assertJson($response->getContent(), '/details returns json');
@@ -33,7 +36,7 @@ class ApiTest extends WebTestCase
         $this->assertArrayHasKey('success', $responseArray);
         $this->assertTrue(!$responseArray['success']);
 
-        $crawler = $client->request('GET', '/details/'.$validId);
+        $client->request('GET', '/details/'.$validId);
         $response = $client->getResponse();
         $this->assertResponseIsSuccessful();
         $this->assertSame(200, $response->getStatusCode());
@@ -42,7 +45,7 @@ class ApiTest extends WebTestCase
         $this->assertArrayHasKey('success', $responseArray);
         $this->assertTrue($responseArray['success']);
 
-        $crawler = $client->request('GET', '/details?id='.$validId);
+        $client->request('GET', '/details?id='.$validId);
         $response = $client->getResponse();
         $this->assertResponseIsSuccessful();
         $this->assertSame(200, $response->getStatusCode());
