@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Services\BearerAuthenticationService;
 use App\Services\DatasourceConnectorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -9,18 +10,31 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ApiController extends AbstractController
 {
+    /** @var DatasourceConnectorService $sourceApi */
     private $sourceApi;
 
-    public function __construct(DatasourceConnectorService $sourceApi)
+    /** @var BearerAuthenticationService $bearerAuthenticationService */
+    private $bearerAuthenticationService;
+
+    /**
+     * @param DatasourceConnectorService $sourceApi
+     * @param BearerAuthenticationService $bearerAuthenticationService
+     */
+    public function __construct(DatasourceConnectorService $sourceApi, BearerAuthenticationService $bearerAuthenticationService)
     {
         $this->sourceApi = $sourceApi;
+        $this->bearerAuthenticationService = $bearerAuthenticationService;
     }
 
     /**
      * @return JsonResponse
      */
-    public function list()
+    public function list(Request $request)
     {
+        if (!$this->bearerAuthenticationService->authenticate($request)) {
+            return $this->unauthorized();
+        }
+
         $list = $this->sourceApi->getList();
         if (!$list['success']) {
             //datasource error
@@ -43,6 +57,10 @@ class ApiController extends AbstractController
      */
     public function details($id, Request $request)
     {
+        if (!$this->bearerAuthenticationService->authenticate($request)) {
+            return $this->unauthorized();
+        }
+
         // First try to get ID as a part of URL like http://mobilly_test.local/details/123
         if (is_null($id) && $request->query->has('id')) {
             // If not success, try standard GET notation: http://mobilly_test.local/details?id=123
@@ -54,7 +72,7 @@ class ApiController extends AbstractController
                 [
                     'success' => false,
                     'Error' => [
-                        'message' => 'No station Id in request',
+                        'message' => 'No station Id in request.',
                         '__type' => 'Wrong request'
                     ]
                 ],
@@ -66,14 +84,14 @@ class ApiController extends AbstractController
         if (!$details['success']) {
             //data source error
             return new JsonResponse(['success' => false, 'Error' => $details['error']], 200);
-        } elseif ($details['result']['total'] > 1) {
-            //multiple results received
+        } elseif ($details['result']['total'] > 1 || $details['result']['records'][0]['STATION_ID'] !== $id) {
+            //multiple results received or $id is wrong
             return new JsonResponse(
                 [
                     'success' => false,
                     'Error' => [
-                        'message' => 'More than one station found',
-                        '__type' => 'Wrong request'
+                        'message' => 'Nothing found.',
+                        '__type' => 'Not Found Error'
                     ]
                 ],
                 200
@@ -84,7 +102,7 @@ class ApiController extends AbstractController
                 [
                     'success' => false,
                     'Error' => [
-                        'message' => 'Nothing found',
+                        'message' => 'Nothing found.',
                         '__type' => 'Not Found Error'
                     ]
                 ],
@@ -92,5 +110,22 @@ class ApiController extends AbstractController
             );
         }
         return new JsonResponse(['success' => true, 'result' => $details['result']['records'][0]]);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    private function unauthorized()
+    {
+        return new JsonResponse(
+            [
+                'success' => false,
+                'Error' => [
+                    'message' => 'You are not authorized to use this service.',
+                    '__type' => 'Not authorized'
+                ]
+            ],
+            401
+        );
     }
 }
