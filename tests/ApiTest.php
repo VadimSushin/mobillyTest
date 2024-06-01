@@ -9,7 +9,8 @@ class ApiTest extends WebTestCase
     public function testApi(): void
     {
         $client = static::createClient();
-
+        $token = $this->getContainer()->getParameter('token');
+        $client->setServerParameter('HTTP_AUTHORIZATION', 'Bearer '.$token);
         $client->request('GET', '/');
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains(
